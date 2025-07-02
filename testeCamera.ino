@@ -1,7 +1,7 @@
 #include "esp_camera.h"
 #include <WiFi.h>
 
-#define TEMPO_FOTO 10000 //10 segundos
+#define TEMPO_FOTO 1000 //1 segundo
 
 
 
@@ -78,17 +78,17 @@ void setup(){
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
+  config.fb_location = CAMERA_FB_IN_DRAM;
 
   if(psramFound()){
-    
-    config.frame_size = FRAMESIZE_QQVGA;       //CONFERE SE O ESP TEM RAM EXTERNA  
+    config.frame_size = FRAMESIZE_VGA;       //CONFERE SE O ESP TEM RAM EXTERNA  
     config.jpeg_quality = 10;                //SO PARA TESTE TIRAR DEPOIS
     config.fb_count = 2;
   }else{
+      config.fb_location = CAMERA_FB_IN_DRAM;
       config.frame_size = FRAMESIZE_CIF;
       config.jpeg_quality = 12;
       config.fb_count = 1;
-      config.fb_location = CAMERA_FB_IN_DRAM;
   }
 
 
@@ -99,7 +99,6 @@ void setup(){
   }
 
   Serial.println("Câmera pronta. Iniciando fotos...");
-  //ultimaFoto = millis(); 
 }
 
 int fotoAtual = 0;
@@ -109,7 +108,7 @@ WiFiClient client;
 
 void loop(){
 
-  if(fotoAtual < 999 && millis() - ultimaFoto >= TEMPO_FOTO){
+  if(fotoAtual < 300 && millis() - ultimaFoto >= TEMPO_FOTO){
 
     
     if(!client.connected()){
@@ -130,10 +129,7 @@ void loop(){
 
       uint32_t img_size = fb->len; 
       client.write((uint8_t*)&img_size, sizeof(img_size));
-      Serial.println(img_size);
-      //Serial.println((uint8_t*)img_size);
       client.write(fb->buf, fb->len);
-      
 
     fotoAtual++;
     esp_camera_fb_return(fb);
