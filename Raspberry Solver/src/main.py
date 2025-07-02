@@ -1,22 +1,15 @@
-# src/main.py
-
-from capture import capture_image
 import cv2
+from color_detect import detect_9_colors
 
-def main():
-    cam_url = "http://localhost:8080/cubo3.jpeg"
+img = cv2.imread("../test_inputs/cubo1.jpeg")
 
-    print(f"[INFO] Testando captura da URL: {cam_url}")
-    img = capture_image(cam_url)
+if img is None:
+    print("Erro ao carregar a imagem.")
+    exit()
 
-    if img is None:
-        print("[ERRO] A captura falhou.")
-        return
+colors, img_marked = detect_9_colors(img)
+print("Cores detectadas:", colors)
 
-    print(f"[INFO] Captura bem-sucedida. Dimensões: {img.shape}")
-    cv2.imshow("Imagem capturada", img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-if __name__ == "__main__":
-    main()
+cv2.imshow("Cubo com cores detectadas", img_marked)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
